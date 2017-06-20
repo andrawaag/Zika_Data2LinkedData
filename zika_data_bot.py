@@ -96,13 +96,14 @@ for land in secondarylocation.keys():
         print(land)
         if secondarylocation[land][location]["wikidata_qid"] != None:
             for date in secondarylocation[land][location].keys():
-                measurementIRI = URIRef("http://cdc_parsed_location.csv/"+land.replace(" ", "_")+location.replace(" ", "_")+date)
-                zikaGraph.add((measurementIRI, RDF.type, wd.Q12453))
-                if land in country.keys():
-                    zikaGraph.add((measurementIRI, wdt.P17, URIRef(country[land.replace("_", " ")])))
-                zikaGraph.add((measurementIRI, wdt.P2257, Literal(tuple.value, datatype=XSD.integer)))
                 if date != "wikidata_qid":
+                    measurementIRI = URIRef("http://cdc_parsed_location.csv/"+land.replace(" ", "_")+location.replace(" ", "_")+date)
+                    zikaGraph.add((measurementIRI, RDF.type, wd.Q12453))
+                    if land in country.keys():
+                        zikaGraph.add((measurementIRI, wdt.P17, URIRef(country[land.replace("_", " ")])))
+                    zikaGraph.add((measurementIRI, wdt.P2257, Literal(tuple.value, datatype=XSD.integer)))
                     zikaGraph.add((measurementIRI, wdt.P585, Literal(date, datatype=XSD.dateTime)))
+                    zikaGraph.add((measurementIRI, wdt.P131, URIRef(secondarylocation[land][location]["wikidata_qid"])))
 
 zikaGraph.serialize(destination="zika.ttl", format='turtle')
 

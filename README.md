@@ -1,6 +1,26 @@
 # Zika_Data2LinkedData
 This reopository contains a python script that converts tabular data on observed Zika cases in the americas. The data is converted to RDF using the Wikidata namespace. 
-Having the data being described in the Wikidata namespaces allows rapid integration with data from Wikidata
+Having the data being described in the Wikidata namespaces allows rapid integration with data from Wikidata using federated SPARQL queries. 
+
+The script `zika_data_bot.py` builds on Zika data provided by the [Zika cdc dashboard](https://chendaniely.shinyapps.io/zika_cdc_dashboard/).
+1. First both the listed countries and their provinces are mapped to their Wikidata IRIs. 
+(e.g Argentina maps to [wd:Q414](https://www.wikidata.org/wiki/Q414).)
+2. Then the appropriate wikidata properties are selected. These are:
+* [country - wdt:P17](http://www.wikidata.org/prop/direct/P17)
+* [frequency of event - wdt:P2257](http://www.wikidata.org/prop/direct/P2257)
+* [point in time - wdt:P585](http://www.wikidata.org/prop/direct/P585)
+* [located in the administrative territorial entity - P131](http://www.wikidata.org/prop/direct/P131)
+3. Metadata on the source is added using the [template](https://oncoxl.fair-dtls.surf-hosted.nl/editor/#!/) provided by [The GoFAIR initiative](https://www.dtls.nl/fair-data/go-fair/)
+
+Finally a linked data file is generated which can be loaded in a triple store, such as [blazegraph](https://www.blazegraph.com/). 
+
+Once loaded a federated SPARQL query can be applied to integrate the CDC data with data from Wikidata. 
+The following example eniches the CDC data with the known latitude and longitude for the mapped administrative locations. 
+
+```sparql
+
+
+```
 
 ### Disclaimer
 The script is for demonstration purposes only. The different data values 
