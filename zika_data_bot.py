@@ -8,13 +8,26 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 import pprint
 from rdflib import Namespace, Graph, URIRef, BNode, Literal
 from rdflib.namespace import DCTERMS, RDFS, RDF, DC, XSD
-
+import datetime
 zikaGraph = Graph()
 wdt = Namespace("http://www.wikidata.org/prop/direct/")
 wd = Namespace("http://www.wikidata.org/entity/")
+dcat = Namespace("http://www.w3.org/ns/dcat#")
+fdp = Namespace("http://rdf.biosemantics.org/ontologies/fdp-o#")
+datacite = Namespace("http://purl.org/spar/datacite/")
 
 zikaGraph.bind("wdt", wdt)
 zikaGraph.bind("wd", wd)
+zikaGraph.bind("dcat", dcat)
+zikaGraph.bind("fdp", fdp)
+zikaGraph.bind("datacite", datacite)
+
+# capture metadata template used: https://oncoxl.fair-dtls.surf-hosted.nl/editor/#!/
+thisFile = URIRef("http://localhost/zika.ttl")
+zikaGraph.add((thisFile, RDF.type, dcat.Distribution))
+zikaGraph.add((thisFile, DCTERMS.title, Literal("CDC Zika Data", lang="en")))
+zikaGraph.add((thisFile, DCTERMS.hasVersion, Literal(str(datetime.datetime.now()))))
+zikaGraph.add((thisFile, dcat.accessURL, URIRef("https://chendaniely.shinyapps.io/zika_cdc_dashboard/")))
 countryMapping = dict()
 secondarylocation = dict()
 wikidata_sparql = SPARQLWrapper("https://query.wikidata.org/bigdata/namespace/wdq/sparql")
