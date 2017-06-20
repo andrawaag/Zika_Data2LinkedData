@@ -1,3 +1,7 @@
+@prefix datacite: <http://purl.org/spar/datacite/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix fdp: <http://rdf.biosemantics.org/ontologies/fdp-o#> .
+@prefix ns1: <http://purl.org/dc/terms/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix wd: <http://www.wikidata.org/entity/> .
@@ -9909,6 +9913,11 @@
 <http://cdc_parsed_location.csv/PanamaVeraguaswikidata_qid> a wd:Q12453 ;
     wdt:P17 wd:Q804 ;
     wdt:P2257 0.0 .
+
+<http://localhost/zika.ttl> a dcat:Distribution ;
+    ns1:hasVersion "2017-06-20 14:29:01.372395" ;
+    ns1:title "CDC Zika Data"@en ;
+    dcat:accessURL <https://chendaniely.shinyapps.io/zika_cdc_dashboard/> .
 
 wd:Q739 rdfs:label "Colombia" .
 
