@@ -1,5 +1,10 @@
 # Zika_Data2LinkedData
-TODO: Write a project description
+This reopository contains a python script that converts tabular data on observed Zika cases in the americas. The data is converted to RDF using the Wikidata namespace. 
+Having the data being described in the Wikidata namespaces allows rapid integration with data from Wikidata
+
+### Disclaimer
+The script is for demonstration purposes only. The different data values 
+are mapped to the Wikidata namespace using freetext search.  
 ## Installation
 TODO: Describe the installation process
 ## Usage
