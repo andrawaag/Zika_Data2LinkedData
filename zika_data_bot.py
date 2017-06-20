@@ -7,11 +7,14 @@ import sys
 from SPARQLWrapper import SPARQLWrapper, JSON
 import pprint
 from rdflib import Namespace, Graph, URIRef, BNode, Literal
-from rdflib.namespace import DCTERMS, RDFS, RDF, DC
+from rdflib.namespace import DCTERMS, RDFS, RDF, DC, XSD
 
 zikaGraph = Graph()
 wdt = Namespace("http://www.wikidata.org/prop/direct/")
 wd = Namespace("http://www.wikidata.org/entity/")
+
+zikaGraph.bind("wdt", wdt)
+zikaGraph.bind("wd", wd)
 countryMapping = dict()
 secondarylocation = dict()
 wikidata_sparql = SPARQLWrapper("https://query.wikidata.org/bigdata/namespace/wdq/sparql")
@@ -77,11 +80,16 @@ pprint.pprint(secondarylocation)
 
 for land in secondarylocation.keys():
     for location in secondarylocation[land].keys():
-        if secondarylocation[land]["wikidata_qid"] != None:
+        print(land)
+        if secondarylocation[land][location]["wikidata_qid"] != None:
             for date in secondarylocation[land][location].keys():
-                measurementIRI = URIRef("http://cdc_parsed_location.csv/"+land+location+date)
+                measurementIRI = URIRef("http://cdc_parsed_location.csv/"+land.replace(" ", "_")+location.replace(" ", "_")+date)
                 zikaGraph.add((measurementIRI, RDF.type, wd.Q12453))
-                zikaGraph.add((measurementIRI, wdt.P17, URIRef(country[tuple.country.replace("_", " ")])))
+                if land in country.keys():
+                    zikaGraph.add((measurementIRI, wdt.P17, URIRef(country[land.replace("_", " ")])))
+                zikaGraph.add((measurementIRI, wdt.P2257, Literal(tuple.value, datatype=XSD.integer)))
+                if date != "wikidata_qid":
+                    zikaGraph.add((measurementIRI, wdt.P585, Literal(date, datatype=XSD.dateTime)))
 
-zikaGraph.serialize(destination="/tmp/zika.ttl", format='turtle')
+zikaGraph.serialize(destination="zika.ttl", format='turtle')
 
