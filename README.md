@@ -15,13 +15,48 @@ The script `zika_data_bot.py` builds on Zika data provided by the [Zika cdc dash
 Finally a linked data file is generated which can be loaded in a triple store, such as [blazegraph](https://www.blazegraph.com/). 
 
 Once loaded a federated SPARQL query can be applied to integrate the CDC data with data from Wikidata. 
-The following example eniches the CDC data with the known latitude and longitude for the mapped administrative locations. 
+The following example enriches the CDC data with the known latitude and longitude for the mapped administrative locations, the english wikipedia article on the administrative region and known academic institutes in the region. 
 
 ```sparql
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX schema: <http://schema.org/>
 
+SELECT DISTINCT ?report_date ?country ?countryLabel ?country_coordinates ?administrative_entity ?administrative_entityLabel ?location_coordinates ?sitelink ?academic_institute ?institute_name ?value  WHERE {
+       ?measurement wdt:P17 ?country ;
+       				wdt:P585 ?report_date ;
+                    wdt:P2257 ?value ;
+                    wdt:P131 ?administrative_entity .
+       FILTER (?value > 0)
+       
+   SERVICE <https://query.wikidata.org/bigdata/namespace/wdq/sparql> {
+       ?administrative_entity wdt:P625 ?location_coordinates ;
+                              rdfs:label ?administrative_entityLabel .
+       ?sitelink schema:about ?administrative_entity ;
+                 schema:inLanguage "en" .
+       ?country wdt:P625 ?country_coordinates ;
+                rdfs:label ?countryLabel .
+       OPTIONAL { ?academic_institute wdt:P31/wdt:P279 wd:Q4671277 ;
+         wdt:P131 ?administrative_entity ;
+                rdfs:label ?institute_name .
+                FILTER (lang(?institute_name)="en")}
+       FILTER(lang(?countryLabel) = "en")
+       FILTER(lang(?administrative_entityLabel) = "en")
+       FILTER(REGEX(str(?sitelink), "wikipedia", "i")) 
+    }
+  }
+
+ORDER BY desc(?value)
 
 ```
+Running this query on a locally installed sparql endpoint, returns the following results:
 
+![example1](screendumps/cdc_zika_location_coordinates.png?raw=true)
+![example2](screendumps/cdc_zika_wikipedia_acadamic_institute.png?raw=true)
 ### Disclaimer
 The script is for demonstration purposes only. The different data values 
 are mapped to the Wikidata namespace using freetext search.  

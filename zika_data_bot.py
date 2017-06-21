@@ -1,14 +1,12 @@
 # Author: Andra Waagmeester
 
 import pandas as pd
-import numpy as np
-import pprint
-import sys
 from SPARQLWrapper import SPARQLWrapper, JSON
 import pprint
 from rdflib import Namespace, Graph, URIRef, BNode, Literal
 from rdflib.namespace import DCTERMS, RDFS, RDF, DC, XSD
 import datetime
+
 zikaGraph = Graph()
 wdt = Namespace("http://www.wikidata.org/prop/direct/")
 wd = Namespace("http://www.wikidata.org/entity/")
@@ -48,13 +46,12 @@ results = wikidata_sparql.query().convert()
 for result in results["results"]["bindings"]:
     country[result["itemLabel"]["value"]] = result["item"]["value"]
 
-
-
 df_core = pd.read_csv("/Users/andra/Downloads/cdc_parsed_location.csv")
+
 pprint.pprint(df_core["country"])
 
 for tuple in df_core.itertuples():
-    #print(tuple)
+
     if type(tuple.country) == str:
         print(tuple.country)
         if tuple.country.replace("_", " ") in country.keys():
@@ -81,29 +78,34 @@ for tuple in df_core.itertuples():
                 secondarylocation[tuple.country.replace("_", " ")][tuple.location2.replace("_", " ")] = {"wikidata_qid": result["item"]["value"]}
             if tuple.location2.replace("_", " ") not in secondarylocation[tuple.country.replace("_", " ")] :
                 secondarylocation[tuple.country.replace("_", " ")][tuple.location2.replace("_", " ")] = {"wikidata_qid": None}
-        # if tuple.location2.replace("_", " ") in secondarylocation[tuple.country.replace("_", " ")].keys():
-        secondarylocation[tuple.country.replace("_", " ")][tuple.location2.replace("_", " ")][tuple.report_date] = {"value":tuple.value, "unit": tuple.unit}
 
+        # if isinstance(tuple.value, float):
+        if pd.notnull(tuple.value):
+            try:
+                secondarylocation[tuple.country.replace("_", " ")][tuple.location2.replace("_", " ")][
+                    tuple.report_date] = {"value": int(tuple.value), "unit": tuple.unit}
+            except ValueError:
+                print("boe")
+                pass
 
-
-
-
-pprint.pprint(country)
 pprint.pprint(secondarylocation)
 
 for land in secondarylocation.keys():
     for location in secondarylocation[land].keys():
-        print(land)
-        if secondarylocation[land][location]["wikidata_qid"] != None:
-            for date in secondarylocation[land][location].keys():
+        # print(land)
+        # if secondarylocation[land][location]["wikidata_qid"] != None:
+        for date in secondarylocation[land][location].keys():
                 if date != "wikidata_qid":
                     measurementIRI = URIRef("http://cdc_parsed_location.csv/"+land.replace(" ", "_")+location.replace(" ", "_")+date)
                     zikaGraph.add((measurementIRI, RDF.type, wd.Q12453))
                     if land in country.keys():
                         zikaGraph.add((measurementIRI, wdt.P17, URIRef(country[land.replace("_", " ")])))
-                    zikaGraph.add((measurementIRI, wdt.P2257, Literal(tuple.value, datatype=XSD.integer)))
+                    #print(type(tuple.value), tuple.value)
+
+                    zikaGraph.add((measurementIRI, wdt.P2257, Literal(secondarylocation[land][location][date]["value"], datatype=XSD.integer)))
                     zikaGraph.add((measurementIRI, wdt.P585, Literal(date, datatype=XSD.dateTime)))
-                    zikaGraph.add((measurementIRI, wdt.P131, URIRef(secondarylocation[land][location]["wikidata_qid"])))
+                    if secondarylocation[land][location]["wikidata_qid"] != None:
+                        zikaGraph.add((measurementIRI, wdt.P131, URIRef(secondarylocation[land][location]["wikidata_qid"])))
 
 zikaGraph.serialize(destination="zika.ttl", format='turtle')
 
