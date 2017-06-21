@@ -58,22 +58,28 @@ Running this query on a locally installed sparql endpoint, returns the following
 ![example1](screendumps/cdc_zika_location_coordinates.png?raw=true)
 ![example2](screendumps/cdc_zika_wikipedia_acadamic_institute.png?raw=true)
 ### Disclaimer
-The script is for demonstration purposes only. The different data values 
-are mapped to the Wikidata namespace using freetext search.  
+The script is for demonstration purposes only. Mapping regions and provinces to theis Wikdiata identifier
+is done by text search, which is error prone. Provinces like Sao Paolo or Buenos Aires have identicical names as cities. 
+This is solved when existing identifiers, such as ISO codes, are used to describe the regions. 
+
 ## Installation
-TODO: Describe the installation process
-## Usage
-TODO: Write usage instructions
-## Contributing
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-## History
-TODO: Write history
-## Credits
-TODO: Write credits
+To be able to do similar or more complex integration with Zika data and other resources such as Wikidata, a local SPARQL endpoint is needed. 
+In this exercise [blazegraph](https://www.blazegraph.com/) is used. Blazegraph can be 
+downloaded[here](https://downloads.sourceforge.net/project/bigdata/bigdata/2.1.1/blazegraph.jar?r=https%3A%2F%2Fwww.blazegraph.com%2Fdownload%2F&ts=1498056181&use_mirror=netix).
+
+1. Start blazegraph:
+  
+  ```java -server -Xmx4g -jar blazegraph.jar```
+  
+  2. Run the python script zika_data_bot.py:
+  
+  ```python3 zika_data_bot.py```
+  
+  3. Upload the resulting zika.ttl file to blazegraph, following the upload [instructions](https://wiki.blazegraph.com/wiki/index.php/Quick_Start#Load_Data)
+  
+  4. Run SPARQL queries in the query interface of your blazegraph instance. 
+
+
 ## License
 The MIT License (MIT)
 =====================
